@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {Script} from "forge-std/Script.sol";
+import {EntryPoint} from "../lib/account-abstraction/contracts/core/EntryPoint.sol";
 
 contract Helper is Script {
     error Helper__InvalidChainId();
@@ -15,9 +16,10 @@ contract Helper is Script {
     uint256 constant ZKSYNC_SEPOLIA_CHAIN_ID = 300;
     uint256 constant LOCAL_CHAIN_ID = 31337;
     address constant BURNER_WALLET = 0x2f58bb8780191e71B538834FfA2329b8Cbb533Af;
-    address constant FOUNDRY_DEFAULT_WALLET =
-        0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38; //Fetched from Base.sol in forge-std
-
+    // address constant FOUNDRY_DEFAULT_WALLET =
+    //     0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38; //Fetched from Base.sol in forge-std
+    address constant ANVIL_DEFAULT_WALLET =
+        0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     NetworkConfig public localNetworkConfig;
     mapping(uint256 chainId => NetworkConfig) public networkConfigs;
 
@@ -67,10 +69,15 @@ contract Helper is Script {
         }
 
         //deploy a mock entry point contract.
-        return
-            NetworkConfig({
-                entryPoint: address(0),
-                account: FOUNDRY_DEFAULT_WALLET
-            });
+        vm.startBroadcast(ANVIL_DEFAULT_WALLET);
+        EntryPoint entryPoint = new EntryPoint();
+        vm.stopBroadcast();
+
+        localNetworkConfig = NetworkConfig({
+            entryPoint: address(entryPoint),
+            account: ANVIL_DEFAULT_WALLET
+        });
+
+        return localNetworkConfig;
     }
 }
