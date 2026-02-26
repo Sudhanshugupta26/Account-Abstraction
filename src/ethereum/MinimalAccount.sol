@@ -46,7 +46,7 @@ contract MinimalAccount is IAccount, Ownable {
         i_entryPoint = IEntryPoint(entryPoint);
     }
 
-    receive() external payable {} // So that this contracct can hold funds in case there is no paymaster
+    receive() external payable {} // So that this contract can hold funds in case there is no paymaster
 
     ///////////////////////////////////
     //      External Functions       //
